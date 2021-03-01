@@ -8,6 +8,7 @@ song=None
 
 while True:
     query=record(engine).lower()
+    print(query)
     if 'prabhu' in query or 'prawhu' in query or 'parabhu' in query or 'pabhu' in query:
         if music_flag:
             player.stop()
@@ -17,6 +18,7 @@ while True:
             song=None
         playsound('./sound/wake_sound.wav')
         query=record(engine).lower()
+        print(query)
         if 'prabhu' in query or 'prawhu' in query or 'parabhu' in query or 'pabhu' in query:
             if 'bye' not in query and 'goodbye' not in query and 'stop' not in query:
                 speak("How may I help you sir!",engine)

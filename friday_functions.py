@@ -20,9 +20,8 @@ import random
 from playsound import playsound
 
 def engine_init():
-    engine=pyttsx3.init('sapi5')
-    voices=engine.getProperty('voices')
-    engine.setProperty('voice',voices[1].id)
+    engine=pyttsx3.init()
+    engine.setProperty('rate',150)
     return engine
 
 def speak(text,engine):
@@ -42,7 +41,7 @@ def welcome(engine):
 
 def record(engine):
 	r=sr.Recognizer()
-	mic=sr.Microphone(device_index=1)
+	mic=sr.Microphone(device_index = 1)
 
 	with mic as source:
 		print("listeninig....")
