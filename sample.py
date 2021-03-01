@@ -1,5 +1,4 @@
 from friday_functions import *
-from playsound import playsound
 
 engine=engine_init()
 welcome(engine)
@@ -41,14 +40,14 @@ while True:
             day=datetime.datetime.now().strftime("%A")
             speak("Today's day is "+str(day),engine)
 
-        elif 'wiki' in query or 'wikipedia' in query or "who is" in query or ('what is' in query and 'meaning' not in query and 'temperature' not in query):
+        elif 'wiki' in query or 'wikipedia' in query or "who is" in query or ('what' in query and 'meaning' not in query and 'temperature' not in query and 'news' not in query and 'affairs' not in query):
             search_wikipedia(query,engine)
 
-        elif 'song' in query or 'play' in query or 'music' in query:
+        elif 'song' in query or 'play' in query or 'music' in query or 'songs' in query or 'musics' in query:
             music_flag,player,song=play_song(query,engine)
 
         elif 'google' in query or ('search' in query and 'meaning' not in query):
-            open_google(query,engine)
+            search_google(query,engine)
 
         elif 'meaning' in query:
             find_meaning(query,engine)
@@ -59,5 +58,8 @@ while True:
         elif "cricket" in query or "score" in query or "match" in query:
             get_score(query,engine)
 
+        elif "news" in query or 'affairs' in query:
+            get_news(engine)
+
     else:
-        print("not prabhu")
+        playsound('./sound/error.mp3')

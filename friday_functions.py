@@ -1,6 +1,3 @@
-#reminder ka dalna he
-#play music
-#current location
 import speech_recognition as sr
 import pyttsx3
 import datetime
@@ -10,16 +7,22 @@ import time
 from googlesearch import search
 from PyDictionary import PyDictionary
 import os
-from youtube_search import YoutubeSearch
+#from youtube_search import YoutubeSearch
+from youtubesearchpython import VideosSearch
+from youtubesearchpython import PlaylistsSearch
 import requests
 import json
 import vlc
 import pafy
+import re
+from pytube import Playlist
+import random
+from playsound import playsound
 
 def engine_init():
     engine=pyttsx3.init('sapi5')
     voices=engine.getProperty('voices')
-    engine.setProperty('voice',voices[0].id)
+    engine.setProperty('voice',voices[1].id)
     return engine
 
 def speak(text,engine):
@@ -35,7 +38,7 @@ def welcome(engine):
     else:
         speak("Hello, Good Evening",engine)
 
-    speak("I am prabhu ,Your personal assistance?",engine)
+    speak("I am prabhu ",engine)
 
 def record(engine):
 	r=sr.Recognizer()
@@ -51,7 +54,7 @@ def record(engine):
 		query=r.recognize_google(audio)
 
 	except Exception:
-		speak("sorry sir not able to recognize plaease pardon",engine)
+		speak("sorry sir not able to recognize",engine)
 		return "None"
 	return query
 
@@ -68,36 +71,36 @@ def search_wikipedia(query,engine):
         speak("Unable to complete your request please try again",engine)
 
 def play_song(query,engine):
-    query=query.replace('on','')
     query=query.replace('any','')
     query=query.replace('some','')
     query=query.replace('random','')
-
-    result = YoutubeSearch(query, max_results=1).to_dict()[0]['id']
-    url=f"https://www.youtube.com/watch?v="+result
-    video=pafy.new(url)
-    audiostreams=video.audiostreams
-    song=audiostreams[0]
-    song.download("temp."+song.extension)
-    speak("Playing Song",engine)
-    player = vlc.MediaPlayer("./temp."+song.extension)
-    player.play()
-    return True,player,song
-
-def open_google(query,engine):
-    query=query.replace('open','')
-    query=query.replace('search','')
-    query=query.replace('google','')
-    query=query.replace('on','')
-    query=query.replace(' ','')
-    speak("Opening Google",engine)
-    if query=='':
-        webbrowser.open("https://www.google.com/")
+    query=query.replace('play','')
+    if 'songs' in query or 'song' in query or 'music' in query or 'musics' in query:
+        playlistsSearch = PlaylistsSearch(query, limit = 2)
+        url=str(playlistsSearch.result()['result'][0]['link'])
+        playlist = Playlist(url)
+        playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
+        url=playlist.video_urls[random.randint(0,len(playlist.video_urls)-1)]
+        video=pafy.new(url)
+        audiostreams=video.audiostreams
+        song=audiostreams[0]
+        song.download("temp."+song.extension)
+        speak("Playing "+query,engine)
+        player = vlc.MediaPlayer("./temp."+song.extension)
+        player.play()
+        return True,player,song
     else:
-        q=search(query,num=1,stop=1)
-        for res in q:
-            webbrowser.open(res)
-    time.sleep(5)
+        videosSearch = VideosSearch(query, limit=2)
+        url=str(videosSearch.result()['result'][0]['link'])
+        #url=f"https://www.youtube.com/watch?v="+result
+        video=pafy.new(url)
+        audiostreams=video.audiostreams
+        song=audiostreams[0]
+        song.download("temp."+song.extension)
+        speak("Playing "+query,engine)
+        player = vlc.MediaPlayer("./temp."+song.extension)
+        player.play()
+        return True,player,song
 
 def search_google(query,engine):
     speak("finding on google",engine)
@@ -125,11 +128,6 @@ def find_meaning(query,engine):
     except Exception:
         speak("Unable to find the meaning of the given word",engine)
 
-def open_webpage(query,engine):
-    speak("opening"+query,engine)
-    webbrowser.open('https://'+query+'.com/')
-    time.sleep(5)
-
 def get_temperature(query,engine):
     query=query.replace('what','')
     query=query.replace('is','')
@@ -142,6 +140,7 @@ def get_temperature(query,engine):
     query=query.replace('climate','')
     query=query.replace('climatic','')
     query=query.replace('condition','')
+    query=query.replace('wear','')
     query=query.replace(" ",'')
     link='https://api.openweathermap.org/data/2.5/weather?q={}&appid=5591a568869751699e2473e756d21655'.format(query)
     url=requests.get(link)
@@ -159,3 +158,20 @@ def get_score(query,engine):
         speak(match_data['stat'],engine)
     except Exception:
         speak("Unable to connect to Server",engine)
+
+def get_news(engine):
+    query_params = {
+      "source": "bbc-news",
+      "sortBy": "top",
+      "apiKey": "32de7139615644cd8c6545d5ef463105"
+    }
+    main_url = " https://newsapi.org/v1/articles"
+    res = requests.get(main_url, params=query_params)
+    open_bbc_page = res.json()
+    article = open_bbc_page["articles"]
+    results = []
+    for ar in article:
+        results.append(ar["title"])
+    for i in range(3):
+        speak(results[i],engine)
+        time.sleep(0.8)
