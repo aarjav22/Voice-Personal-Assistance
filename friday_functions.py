@@ -7,7 +7,6 @@ import time
 from googlesearch import search
 from PyDictionary import PyDictionary
 import os
-#from youtube_search import YoutubeSearch
 from youtubesearchpython import VideosSearch
 from youtubesearchpython import PlaylistsSearch
 import requests
@@ -31,13 +30,13 @@ def speak(text,engine):
 def welcome(engine):
     hour=int(datetime.datetime.now().hour)
     if hour>=0 and hour<12:
-        speak("Hello, Good Morning",engine)
+        playsound('./sound/goodmorning.mp3')
     elif hour>=12 and hour<18:
-        speak("Hello, Good Afternoon",engine)
+        playsound('./sound/goodafternoon.mp3')
     else:
-        speak("Hello, Good Evening",engine)
+        playsound('./sound/goodevening.mp3')
 
-    speak("I am prabhu ",engine)
+    playsound('./sound/init.mp3')
 
 def record(engine):
 	r=sr.Recognizer()
@@ -53,8 +52,8 @@ def record(engine):
 		query=r.recognize_google(audio)
 
 	except Exception:
-		speak("sorry sir not able to recognize",engine)
-		return "None"
+		playsound('./sound/recorgnising_error.mp3')
+		return None
 	return query
 
 def search_wikipedia(query,engine):
@@ -67,7 +66,7 @@ def search_wikipedia(query,engine):
         speak("according to wikipedia",engine)
         speak(result,engine)
     except Exception as e:
-        speak("Unable to complete your request please try again",engine)
+        playsound('./sound/wikipedia.mp3')
 
 def play_song(query,engine):
     query=query.replace('any','')
@@ -84,7 +83,7 @@ def play_song(query,engine):
         audiostreams=video.audiostreams
         song=audiostreams[0]
         song.download("temp."+song.extension)
-        speak("Playing "+query,engine)
+        playsound('./sound/music.mp3')
         player = vlc.MediaPlayer("./temp."+song.extension)
         player.play()
         return True,player,song
@@ -96,13 +95,13 @@ def play_song(query,engine):
         audiostreams=video.audiostreams
         song=audiostreams[0]
         song.download("temp."+song.extension)
-        speak("Playing "+query,engine)
+        playsound('./sound/music.mp3')
         player = vlc.MediaPlayer("./temp."+song.extension)
         player.play()
         return True,player,song
 
 def search_google(query,engine):
-    speak("finding on google",engine)
+    playsound('./sound/google.mp3')
     q=search(query,num=1,stop=1)
     for res in q:
         webbrowser.open(res)
@@ -125,7 +124,7 @@ def find_meaning(query,engine):
         speak("The meaning of the word"+query+'is',engine)
         speak(mean,engine)
     except Exception:
-        speak("Unable to find the meaning of the given word",engine)
+        playsound('./sound/meaning.mp3')
 
 def get_temperature(query,engine):
     query=query.replace('what','')
@@ -149,14 +148,15 @@ def get_temperature(query,engine):
         speak("Humidity in"+query+'is'+str(data['main']['humidity']),engine)
         speak("wind speed in"+query+'is'+str(data['wind']['speed']),engine)
     except Exception:
-        speak("Unable to locate the given city name",engine)
+        playsound('./music/weather.mp3')
 
 def get_score(query,engine):
     try:
         match_data=requests.get("https://cricapi.com/api/cricketScore?unique_id=918033&apikey=JABI4051uYhg9z3EI4e7k9UKcT83").json()
         speak(match_data['stat'],engine)
     except Exception:
-        speak("Unable to connect to Server",engine)
+        playsound('./music/score.mp3')
+
 
 def get_news(engine):
     query_params = {
@@ -171,6 +171,7 @@ def get_news(engine):
     results = []
     for ar in article:
         results.append(ar["title"])
+    playsound('./music/news.mp3')
     for i in range(3):
         speak(results[i],engine)
         time.sleep(0.8)
