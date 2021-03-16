@@ -16,7 +16,8 @@ while True:
             music_flag=False
             player=None
             song=None
-        playsound('./sound/wake_sound.wav')
+        player = vlc.MediaPlayer("./sound/wake_sound.wav")
+        player.play()
         query=record(engine).lower()
         print(query)
         if 'prabhu' in query or 'prawhu' in query or 'parabhu' in query or 'pabhu' in query:
@@ -64,4 +65,5 @@ while True:
             get_news(engine)
 
     else:
-        playsound('./sound/error.mp3')
+        player = vlc.MediaPlayer("./sound/error.mp3")
+        player.play()
