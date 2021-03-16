@@ -16,30 +16,53 @@ import pafy
 import re
 from pytube import Playlist
 import random
+import simpleaudio as sa
+from ibm_watson import TextToSpeechV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
 def engine_init():
-    engine=pyttsx3.init()
-    engine.setProperty('rate',150)
-    return engine
+    #engine=pyttsx3.init()
+    #engine.setProperty('rate',150)
+    url='https://api.eu-gb.text-to-speech.watson.cloud.ibm.com/instances/206bbbf3-fd4a-4056-8d60-08d71df421d2'
+    key='nFPkrGzuJRK7OR-KxjQOEIqTxZfG1eIqc1Tf4-7A-lYx'
+    authenticator = IAMAuthenticator(key)
+    text_to_speech = TextToSpeechV1(
+    authenticator=authenticator
+    )
+    text_to_speech.set_service_url(url)
+    return text_to_speech
+
+def text_to_speech(text,engine):
+    with open('temp.wav', 'wb') as audio_file:
+        audio_file.write(
+            engine.synthesize(
+                text,
+                voice='en-US_HenryV3Voice',
+                accept='audio/wav'
+            ).get_result().content)
+
+    playsound("temp.wav")
+    os.remove('temp.wav')
 
 def speak(text,engine):
     engine.say(text)
     engine.runAndWait()
 
-def welcome(engine):
+def playsound(file_path):
+    wave_obj = sa.WaveObject.from_wave_file(file_path)
+    play_obj = wave_obj.play()
+    play_obj.wait_done()
+
+def welcome():
     hour=int(datetime.datetime.now().hour)
     if hour>=0 and hour<12:
-        player = vlc.MediaPlayer("./sound/goodmorning.mp3")
-        player.play()
+        playsound("./sound/goodmorning.wav")
     elif hour>=12 and hour<18:
-        player = vlc.MediaPlayer("./sound/goodafternoon.mp3")
-        player.play()
+        playsound("./sound/goodafternoon.wav")
     else:
-        player = vlc.MediaPlayer("./sound/goodevening.mp3")
-        player.play()
+        playsound("./sound/goodevening.wav")
 
-    player = vlc.MediaPlayer("./sound/init.mp3")
-    player.play()
+    playsound("./sound/init.wav")
 
 def record(engine):
 	r=sr.Recognizer()
@@ -55,9 +78,8 @@ def record(engine):
 		query=r.recognize_google(audio)
 
 	except Exception:
-        player = vlc.MediaPlayer("./sound/recorgnising_error.mp3")
-        player.play()
-		return None
+         playsound("./sound/recorgnising_error.wav")
+         return "Not recorgnized"
 	return query
 
 def search_wikipedia(query,engine):
@@ -70,8 +92,7 @@ def search_wikipedia(query,engine):
         speak("according to wikipedia",engine)
         speak(result,engine)
     except Exception as e:
-        player = vlc.MediaPlayer("./sound/wikipedia.mp3")
-        player.play()
+        playsound("./sound/wikipedia.wav")
 
 def play_song(query,engine):
     query=query.replace('any','')
@@ -88,8 +109,7 @@ def play_song(query,engine):
         audiostreams=video.audiostreams
         song=audiostreams[0]
         song.download("temp."+song.extension)
-        player = vlc.MediaPlayer("./sound/music.mp3")
-        player.play()
+        playsound("./sound/music.wav")
         player = vlc.MediaPlayer("./temp."+song.extension)
         player.play()
         return True,player,song
@@ -101,15 +121,13 @@ def play_song(query,engine):
         audiostreams=video.audiostreams
         song=audiostreams[0]
         song.download("temp."+song.extension)
-        player = vlc.MediaPlayer("./sound/music.mp3")
-        player.play()
+        playsound("./sound/music.wav")
         player = vlc.MediaPlayer("./temp."+song.extension)
         player.play()
         return True,player,song
 
 def search_google(query,engine):
-    player = vlc.MediaPlayer("./sound/google.mp3")
-    player.play()
+    playsound("./sound/google.wav")
     q=search(query,num=1,stop=1)
     for res in q:
         webbrowser.open(res)
@@ -132,8 +150,7 @@ def find_meaning(query,engine):
         speak("The meaning of the word"+query+'is',engine)
         speak(mean,engine)
     except Exception:
-        player = vlc.MediaPlayer("./sound/meaning.mp3")
-        player.play()
+        playsound("./sound/meaning.wav")
 
 def get_temperature(query,engine):
     query=query.replace('what','')
@@ -157,16 +174,14 @@ def get_temperature(query,engine):
         speak("Humidity in"+query+'is'+str(data['main']['humidity']),engine)
         speak("wind speed in"+query+'is'+str(data['wind']['speed']),engine)
     except Exception:
-        player = vlc.MediaPlayer("./music/weather.mp3")
-        player.play()
+        playsound("./sound/weather.wav")
 
 def get_score(query,engine):
     try:
         match_data=requests.get("https://cricapi.com/api/cricketScore?unique_id=918033&apikey=JABI4051uYhg9z3EI4e7k9UKcT83").json()
         speak(match_data['stat'],engine)
     except Exception:
-        player = vlc.MediaPlayer("./music/score.mp3")
-        player.play()
+        playsound("./sound/score.wav")
 
 
 def get_news(engine):
@@ -176,14 +191,17 @@ def get_news(engine):
       "apiKey": "32de7139615644cd8c6545d5ef463105"
     }
     main_url = " https://newsapi.org/v1/articles"
-    res = requests.get(main_url, params=query_params)
-    open_bbc_page = res.json()
+    try:
+        res = requests.get(main_url, params=query_params)
+        open_bbc_page = res.json()
+    except Exception:
+        playsound("./sound/news.wav")
+        return None
     article = open_bbc_page["articles"]
     results = []
     for ar in article:
         results.append(ar["title"])
-    player = vlc.MediaPlayer("./music/news.mp3")
-    player.play()
     for i in range(3):
-        speak(results[i],engine)
+        #speak(results[i],engine)
+        text_to_speech(results[i],engine)
         time.sleep(0.8)

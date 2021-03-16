@@ -1,11 +1,11 @@
 from friday_functions import *
 
 engine=engine_init()
-welcome(engine)
+welcome()
 music_flag=False
 player=None
 song=None
-
+print(random.randint(0,10))
 while True:
     query=record(engine).lower()
     print(query)
@@ -16,8 +16,7 @@ while True:
             music_flag=False
             player=None
             song=None
-        player = vlc.MediaPlayer("./sound/wake_sound.wav")
-        player.play()
+        playsound("./sound/wake_sound.wav")
         query=record(engine).lower()
         print(query)
         if 'prabhu' in query or 'prawhu' in query or 'parabhu' in query or 'pabhu' in query:
@@ -41,9 +40,9 @@ while True:
 
         elif 'day' in query:
             day=datetime.datetime.now().strftime("%A")
-            speak("Today's day is "+str(day),engine)
+            text_to_speech("Today's day is "+str(day))
 
-        elif 'wiki' in query or 'wikipedia' in query or "who is" in query or ('what' in query and 'meaning' not in query and 'temperature' not in query and 'news' not in query and 'affairs' not in query):
+        elif 'wiki' in query or 'wikipedia' in query or "who is" in query or ('what' in query and 'meaning' not in query and 'temperature' not in query and 'news' not in query and 'affairs' not in query and 'score' not in query):
             search_wikipedia(query,engine)
 
         elif 'song' in query or 'play' in query or 'music' in query or 'songs' in query or 'musics' in query:
@@ -65,5 +64,4 @@ while True:
             get_news(engine)
 
     else:
-        player = vlc.MediaPlayer("./sound/error.mp3")
-        player.play()
+        playsound("./sound/error.wav")
