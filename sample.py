@@ -5,7 +5,7 @@ welcome()
 music_flag=False
 player=None
 song=None
-print(random.randint(0,10))
+
 while True:
     query=record(engine).lower()
     print(query)
@@ -21,26 +21,29 @@ while True:
         print(query)
         if 'prabhu' in query or 'prawhu' in query or 'parabhu' in query or 'pabhu' in query:
             if 'bye' not in query and 'goodbye' not in query and 'stop' not in query:
-                speak("How may I help you sir!",engine)
+                #speak("How may I help you sir!",engine)
+                playsound("./sound/greeting.wav")
             else:
-                speak("Thank You for your time sir",engine)
+                #speak("Thank You for your time sir",engine)
+                playsound("./sound/thank_you.wav")
                 break
 
         elif 'bye' in query or 'stop' in query or 'end' in query or 'goodbye' in query:
-            speak("Thank You ",engine)
+            #speak("Thank You ",engine)
+            playsound("./sound/thank_you.wav")
             break
 
         elif 'time' in query:
             time=datetime.datetime.now().strftime("%H:%M:%S")
-            speak("Current time is "+str(time),engine)
+            text_to_speech("Current time is "+str(time),engine)
 
         elif 'date' in query:
             date=datetime.date.today()
-            speak("Todays date is "+str(date),engine)
+            text_to_speech("Today's date is "+str(date),engine)
 
         elif 'day' in query:
             day=datetime.datetime.now().strftime("%A")
-            text_to_speech("Today's day is "+str(day))
+            text_to_speech("Today's day is "+str(day),engine)
 
         elif 'wiki' in query or 'wikipedia' in query or "who is" in query or ('what' in query and 'meaning' not in query and 'temperature' not in query and 'news' not in query and 'affairs' not in query and 'score' not in query):
             search_wikipedia(query,engine)

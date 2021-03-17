@@ -1,8 +1,8 @@
 import speech_recognition as sr
-import pyttsx3
+#import pyttsx3
 import datetime
 import wikipedia
-import webbrowser
+#import webbrowser
 import time
 from googlesearch import search
 from PyDictionary import PyDictionary
@@ -21,8 +21,6 @@ from ibm_watson import TextToSpeechV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
 def engine_init():
-    #engine=pyttsx3.init()
-    #engine.setProperty('rate',150)
     url='https://api.eu-gb.text-to-speech.watson.cloud.ibm.com/instances/206bbbf3-fd4a-4056-8d60-08d71df421d2'
     key='nFPkrGzuJRK7OR-KxjQOEIqTxZfG1eIqc1Tf4-7A-lYx'
     authenticator = IAMAuthenticator(key)
@@ -37,17 +35,17 @@ def text_to_speech(text,engine):
         audio_file.write(
             engine.synthesize(
                 text,
-                voice='en-US_HenryV3Voice',
+                voice='en-US_MichaelV3Voice',
                 accept='audio/wav'
             ).get_result().content)
 
     playsound("temp.wav")
     os.remove('temp.wav')
 
-def speak(text,engine):
+"""def speak(text,engine):
     engine.say(text)
     engine.runAndWait()
-
+"""
 def playsound(file_path):
     wave_obj = sa.WaveObject.from_wave_file(file_path)
     play_obj = wave_obj.play()
@@ -89,8 +87,7 @@ def search_wikipedia(query,engine):
     query=query.replace("what is","")
     try:
         result=wikipedia.summary(query,sentences=1)
-        speak("according to wikipedia",engine)
-        speak(result,engine)
+        text_to_speech("according to wikipedia"+result,engine)
     except Exception as e:
         playsound("./sound/wikipedia.wav")
 
@@ -130,7 +127,8 @@ def search_google(query,engine):
     playsound("./sound/google.wav")
     q=search(query,num=1,stop=1)
     for res in q:
-        webbrowser.open(res)
+        #webbrowser.open(res)
+        print("aarjav")
     time.sleep(5)
 
 def find_meaning(query,engine):
@@ -147,8 +145,7 @@ def find_meaning(query,engine):
     dictionary=PyDictionary()
     try:
         mean=dictionary.meaning(query)['Noun'][0]
-        speak("The meaning of the word"+query+'is',engine)
-        speak(mean,engine)
+        text_to_speech("The meaning of the word"+query+'is'+mean,engine)
     except Exception:
         playsound("./sound/meaning.wav")
 
@@ -168,18 +165,19 @@ def get_temperature(query,engine):
     query=query.replace(" ",'')
     link='https://api.openweathermap.org/data/2.5/weather?q={}&appid=5591a568869751699e2473e756d21655'.format(query)
     url=requests.get(link)
+
     try:
         data=url.json()
-        speak("Temperature of"+query+'is'+str(round(data['main']['temp']-273.15,2)),engine)
-        speak("Humidity in"+query+'is'+str(data['main']['humidity']),engine)
-        speak("wind speed in"+query+'is'+str(data['wind']['speed']),engine)
+        text_to_speech("Temperature of"+query+'is'+str(round(data['main']['temp']-273.15,2))+'.'+"Humidity in"+query+'is'+str(data['main']['humidity'])+'.'+
+        "wind speed in"+query+'is'+str(data['wind']['speed'])+'.',engine)
+
     except Exception:
         playsound("./sound/weather.wav")
 
 def get_score(query,engine):
     try:
         match_data=requests.get("https://cricapi.com/api/cricketScore?unique_id=918033&apikey=JABI4051uYhg9z3EI4e7k9UKcT83").json()
-        speak(match_data['stat'],engine)
+        text_to_speech(match_data['stat'],engine)
     except Exception:
         playsound("./sound/score.wav")
 
@@ -198,10 +196,5 @@ def get_news(engine):
         playsound("./sound/news.wav")
         return None
     article = open_bbc_page["articles"]
-    results = []
-    for ar in article:
-        results.append(ar["title"])
-    for i in range(3):
-        #speak(results[i],engine)
-        text_to_speech(results[i],engine)
-        time.sleep(0.8)
+
+    text_to_speech(article[0]['title'],engine)
