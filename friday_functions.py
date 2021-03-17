@@ -168,8 +168,8 @@ def get_temperature(query,engine):
 
     try:
         data=url.json()
-        text_to_speech("Temperature of"+query+'is'+str(round(data['main']['temp']-273.15,2))+'.'+"Humidity in"+query+'is'+str(data['main']['humidity'])+'.'+
-        "wind speed in"+query+'is'+str(data['wind']['speed'])+'.',engine)
+        text_to_speech("Temperature is"+str(round(data['main']['temp']-273.15,2))+'.'+"Humidity is"+str(data['main']['humidity'])+'.'+
+        "wind speed is"+str(data['wind']['speed'])+'.',engine)
 
     except Exception:
         playsound("./sound/weather.wav")
@@ -196,5 +196,4 @@ def get_news(engine):
         playsound("./sound/news.wav")
         return None
     article = open_bbc_page["articles"]
-
     text_to_speech(article[0]['title'],engine)

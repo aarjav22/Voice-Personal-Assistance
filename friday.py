@@ -31,7 +31,7 @@ wave_obj = sa.WaveObject.from_wave_file("temp.wav")
 play_obj = wave_obj.play()
 play_obj.wait_done()"""
 
-import requests
+"""import requests
 query_params = {
   "source": "bbc-news",
   "sortBy": "top",
@@ -47,3 +47,10 @@ except Exception:
 article = open_bbc_page["articles"]
 print(article[0]['title'])
 print(article[1])
+"""
+
+import requests
+from datetime import datetime
+match_data=requests.get("https://cricapi.com/api/matches?apikey=JABI4051uYhg9z3EI4e7k9UKcT83").json()['matches']
+for data in match_data:
+    print(data)

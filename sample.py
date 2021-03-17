@@ -8,6 +8,8 @@ song=None
 
 while True:
     query=record(engine).lower()
+    if query=="Not recorgnized":
+        continue;
     print(query)
     if 'prabhu' in query or 'prawhu' in query or 'parabhu' in query or 'pabhu' in query:
         if music_flag:
