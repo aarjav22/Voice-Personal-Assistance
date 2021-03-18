@@ -8,7 +8,8 @@ song=None
 
 while True:
     query=record(engine).lower()
-    if query=="Not recorgnized":
+    if query=="not recorgnized":
+        print("aarjav")
         continue;
     print(query)
     if 'prabhu' in query or 'prawhu' in query or 'parabhu' in query or 'pabhu' in query:
@@ -23,15 +24,12 @@ while True:
         print(query)
         if 'prabhu' in query or 'prawhu' in query or 'parabhu' in query or 'pabhu' in query:
             if 'bye' not in query and 'goodbye' not in query and 'stop' not in query:
-                #speak("How may I help you sir!",engine)
                 playsound("./sound/greeting.wav")
             else:
-                #speak("Thank You for your time sir",engine)
                 playsound("./sound/thank_you.wav")
                 break
 
         elif 'bye' in query or 'stop' in query or 'end' in query or 'goodbye' in query:
-            #speak("Thank You ",engine)
             playsound("./sound/thank_you.wav")
             break
 

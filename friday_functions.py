@@ -1,8 +1,6 @@
 import speech_recognition as sr
-#import pyttsx3
 import datetime
 import wikipedia
-#import webbrowser
 import time
 from googlesearch import search
 from PyDictionary import PyDictionary
@@ -42,10 +40,6 @@ def text_to_speech(text,engine):
     playsound("temp.wav")
     os.remove('temp.wav')
 
-"""def speak(text,engine):
-    engine.say(text)
-    engine.runAndWait()
-"""
 def playsound(file_path):
     wave_obj = sa.WaveObject.from_wave_file(file_path)
     play_obj = wave_obj.play()
@@ -113,7 +107,6 @@ def play_song(query,engine):
     else:
         videosSearch = VideosSearch(query, limit=2)
         url=str(videosSearch.result()['result'][0]['link'])
-        #url=f"https://www.youtube.com/watch?v="+result
         video=pafy.new(url)
         audiostreams=video.audiostreams
         song=audiostreams[0]
@@ -127,7 +120,6 @@ def search_google(query,engine):
     playsound("./sound/google.wav")
     q=search(query,num=1,stop=1)
     for res in q:
-        #webbrowser.open(res)
         print("aarjav")
     time.sleep(5)
 
@@ -175,12 +167,16 @@ def get_temperature(query,engine):
         playsound("./sound/weather.wav")
 
 def get_score(query,engine):
+    score=''
     try:
-        match_data=requests.get("https://cricapi.com/api/cricketScore?unique_id=918033&apikey=JABI4051uYhg9z3EI4e7k9UKcT83").json()
-        text_to_speech(match_data['stat'],engine)
+        match_data=requests.get("https://cricapi.com/api/matches?apikey=JABI4051uYhg9z3EI4e7k9UKcT83").json()
+        for data in match_data['matches']:
+            if datetime.date.today()==datetime.datetime.strptime(data['date'].split('T')[0],'%Y-%m-%d').date() and data['matchStarted']==True:
+                score+=requests.get("https://cricapi.com/api/cricketScore?apikey=JABI4051uYhg9z3EI4e7k9UKcT83&unique_id={}".format(data['unique_id'])).json()['score']
+                score+='.'
+        text_to_speech(score,engine)
     except Exception:
         playsound("./sound/score.wav")
-
 
 def get_news(engine):
     query_params = {
@@ -196,4 +192,5 @@ def get_news(engine):
         playsound("./sound/news.wav")
         return None
     article = open_bbc_page["articles"]
+    playsound("./sound/top_headline.wav")
     text_to_speech(article[0]['title'],engine)

@@ -49,8 +49,23 @@ print(article[0]['title'])
 print(article[1])
 """
 
+# Import the beautifulsoup
+# and request libraries of python.
 import requests
-from datetime import datetime
-match_data=requests.get("https://cricapi.com/api/matches?apikey=JABI4051uYhg9z3EI4e7k9UKcT83").json()['matches']
-for data in match_data:
-    print(data)
+import bs4
+
+# Make two strings with default google search URL
+# 'https://google.com/search?q=' and
+# our customized search keyword.
+# Concatenate them
+text= "geeksforgeeks"
+url = 'https://google.com/search?q=' + text
+
+# Fetch the URL data using requests.get(url),
+# store it in a variable, request_result.
+request_result=requests.get( url )
+
+# Creating soup from the fetched request
+soup = bs4.BeautifulSoup(request_result.text,
+                         "html.parser")
+print(soup) 
