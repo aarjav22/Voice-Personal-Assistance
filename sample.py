@@ -63,7 +63,7 @@ while True:
         elif "cricket" in query or "score" in query or "match" in query:
             get_score(query,engine)
 
-        elif "news" in query or 'affairs' in query:
+        elif "news" in query or 'affairs' in query or 'headlines' in query or 'affair' in queue:
             get_news(engine)
 
     else:
